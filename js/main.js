@@ -124,24 +124,133 @@ ScrollReveal().reveal('.about-image', {
     origin: 'left'
 });
 
-// Dark/Light mode switch
-const themeSwitch = document.querySelector('.theme-switch');
+// Dark Mode Toggle
+const themeSwitch = document.querySelector('#checkbox');
 const body = document.body;
 
-themeSwitch.addEventListener('click', () => {
-    body.classList.toggle('dark-mode');
-    const icon = themeSwitch.querySelector('i');
-    icon.classList.toggle('fa-moon');
-    icon.classList.toggle('fa-sun');
+// Check for saved user preference, if any, on load of the website
+const darkMode = localStorage.getItem('darkMode');
+
+if (darkMode === 'enabled') {
+    body.classList.add('dark-mode');
+    themeSwitch.checked = true;
+}
+
+themeSwitch.addEventListener('change', () => {
+    if (themeSwitch.checked) {
+        body.classList.add('dark-mode');
+        localStorage.setItem('darkMode', 'enabled');
+    } else {
+        body.classList.remove('dark-mode');
+        localStorage.setItem('darkMode', null);
+    }
 });
 
-// Mobil menü
+// Resume Section
+const checkboxes = document.querySelectorAll('.customize-options input[type="checkbox"]');
+const resumeSections = document.querySelectorAll('.resume-section');
+
+checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+        const section = checkbox.dataset.section;
+        const targetSection = document.querySelector(`.resume-section[data-section="${section}"]`);
+        
+        if (targetSection) {
+            if (checkbox.checked) {
+                targetSection.style.display = 'block';
+            } else {
+                targetSection.style.display = 'none';
+            }
+        }
+    });
+});
+
+// CV Download Functions
+const downloadButtons = document.querySelectorAll('.download-btn');
+
+downloadButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const format = button.dataset.format;
+        const selectedSections = [];
+        
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedSections.push(checkbox.dataset.section);
+            }
+        });
+        
+        generateCV(format, selectedSections);
+    });
+});
+
+function generateCV(format, sections) {
+    // Bu fonksiyon CV'yi seçilen formatta oluşturup indirecek
+    // HTML2PDF veya başka bir kütüphane kullanılabilir
+    console.log(`Generating CV in ${format} format with sections:`, sections);
+    alert('CV indirme özelliği yakında eklenecek!');
+}
+
+// Testimonials Slider
+const testimonialsSlider = document.querySelector('.testimonials-slider');
+const testimonialCards = document.querySelectorAll('.testimonial-card');
+const prevBtn = document.querySelector('.testimonial-btn.prev');
+const nextBtn = document.querySelector('.testimonial-btn.next');
+
+let currentSlide = 0;
+
+function showSlide(index) {
+    testimonialCards.forEach((card, i) => {
+        if (i === index) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+prevBtn.addEventListener('click', () => {
+    currentSlide = (currentSlide - 1 + testimonialCards.length) % testimonialCards.length;
+    showSlide(currentSlide);
+});
+
+nextBtn.addEventListener('click', () => {
+    currentSlide = (currentSlide + 1) % testimonialCards.length;
+    showSlide(currentSlide);
+});
+
+// Initialize first slide
+showSlide(currentSlide);
+
+// Smooth Scroll
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            window.scrollTo({
+                top: target.offsetTop - 80,
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+
+// Mobile Menu Toggle
 const mobileMenu = document.querySelector('.mobile-menu');
 const navLinks = document.querySelector('.nav-links');
 
 mobileMenu.addEventListener('click', () => {
     mobileMenu.classList.toggle('active');
     navLinks.classList.toggle('active');
+});
+
+// Mobil menü
+const mobileMenuOld = document.querySelector('.mobile-menu-old');
+const navLinksOld = document.querySelector('.nav-links-old');
+
+mobileMenuOld.addEventListener('click', () => {
+    mobileMenuOld.classList.toggle('active');
+    navLinksOld.classList.toggle('active');
 });
 
 // Smooth scroll
@@ -156,8 +265,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             });
         }
         // Mobil menüyü kapat
-        mobileMenu.classList.remove('active');
-        navLinks.classList.remove('active');
+        mobileMenuOld.classList.remove('active');
+        navLinksOld.classList.remove('active');
     });
 });
 
